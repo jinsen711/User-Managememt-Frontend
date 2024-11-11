@@ -58,6 +58,7 @@ const BasicList = () => {
             return item.hideInColumn !== true;
           })}
           pagination={false}
+          loading={init?.loading}
         />
         {afterTableLayout()}
       </Card>
