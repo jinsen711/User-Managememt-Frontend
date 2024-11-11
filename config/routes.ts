@@ -52,7 +52,7 @@ export default [
     component: './TableList',
   },
   {
-    name: 'basic-list',
+    name: 'list.basic-list',
     icon: 'table',
     path: '/basic-list',
     component: './BasicList',
