@@ -10,6 +10,8 @@
 
 效果演示: `https://public-api-v2.aspirantzhang.com/admin/` 账号密码: `admin0/admin0`
 
+json to ts: `https://json2ts.dev/`
+
 ## 安装和运行
 
     git clone -b learn git@github.com:jinsen711/User-Management-Frontend.git
