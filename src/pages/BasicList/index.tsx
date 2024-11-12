@@ -1,9 +1,12 @@
 import { PageContainer } from '@ant-design/pro-layout';
-import { Button, Card, Col, Pagination, Row, Space, Table } from 'antd';
+import { Card, Col, Pagination, Row, Space, Table } from 'antd';
 // Card 把 Col Row 包裹起来，使底色变成白色
 // Col Row 分栏布局
 import { useRequest } from '@umijs/max';
 import { useEffect, useState } from 'react';
+
+import ActionBuilder from './Builder/ActionBuilder';
+import ColumnBuilder from './Builder/ColumnBuilder';
 import styles from './index.less';
 
 const BasicList = () => {
@@ -31,10 +34,7 @@ const BasicList = () => {
           ...
         </Col>
         <Col xs={24} sm={12} className={styles.tableToolbar}>
-          <Space>
-            <Button type="primary">Add</Button>
-            <Button type="primary">Add2</Button>
-          </Space>
+          <Space>{ActionBuilder(init?.data?.layout?.tableToolBar)}</Space>
         </Col>
       </Row>
     );
@@ -67,12 +67,10 @@ const BasicList = () => {
       <Card>
         {beforeTableLayout()}
         <Table
-          dataSource={init?.data?.dataSource}
-          columns={init?.data?.layout?.tableColumn.filter((item: any) => {
-            return item.hideInColumn !== true;
-          })}
-          pagination={false}
-          loading={init?.loading}
+          dataSource={init?.data?.dataSource} // 表格数据
+          columns={ColumnBuilder(init?.data?.layout.tableColumn)} // 表格列配置
+          pagination={false} // 关闭默认分页
+          loading={init?.loading} // 显示加载中效果
         />
         {afterTableLayout()}
       </Card>

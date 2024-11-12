@@ -57,36 +57,19 @@ declare module BasicListApi {
     title: string;
     dataIndex: string;
     key: string;
-    type: string;
+    type?: string;
     data?: Datum[];
     hideInColumn?: boolean;
     sorter?: boolean;
     mode?: string;
     actions?: Action[];
-  }
-
-  interface TableToolBar {
-    component: string;
-    text: string;
-    type: string;
-    action: string;
-    id?: string;
-    uri?: string;
-  }
-
-  interface BatchToolBar {
-    component: string;
-    text: string;
-    type: string;
-    action: string;
-    uri?: string;
-    method?: string;
+    [keyof: string]: any; // 可以添加任意属性
   }
 
   interface Layout {
     tableColumn: TableColumn[];
-    tableToolBar: TableToolBar[];
-    batchToolBar: BatchToolBar[];
+    tableToolBar: Action[];
+    batchToolBar: Action[];
   }
 
   interface Pivot {
