@@ -12,15 +12,17 @@ import styles from './index.less';
 const BasicList = () => {
   const [page, setPage] = useState(1);
   const [per_page, setPerPage] = useState(10);
+  const [sort, setSort] = useState('id');
+  const [order, setOrder] = useState('desc'); // 排序方式，asc 升序，desc 降序
   // useRequest 请求数据, 必须使用 localhost:8000 才能访问到输入，因为后端返回的 Access-Control-Allow-Origin 是 http://localhost:8000
   const init = useRequest<{ data: BasicListApi.Data }>(
-    `https://public-api-v2.aspirantzhang.com/api/admins?X-API-KEY=antd&page=${page}&per_page=${per_page}`,
+    `https://public-api-v2.aspirantzhang.com/api/admins?X-API-KEY=antd&page=${page}&per_page=${per_page}&sort=${sort}&order=${order}`,
   );
 
-  // 当 page 或者 per_page 变化时，重新请求数据
+  // 分页-表格排序, 当 page 或者 per_page 变化时，重新请求数据
   useEffect(() => {
     init.run();
-  }, [page, per_page]);
+  }, [page, per_page, sort, order]);
 
   const paginationChangeHandler = (_page: number, _per_page: number) => {
     setPage(_page);
@@ -61,6 +63,16 @@ const BasicList = () => {
     );
   };
 
+  const onChange = (pagination: any, filters: any, sorter: any, extra: any) => {
+    if (sorter.columnKey) {
+      // 重置分页
+      setPage(1);
+      // 设置排序
+      setSort(sorter.columnKey);
+      setOrder(sorter.order === 'ascend' ? 'asc' : 'desc');
+    }
+  };
+
   return (
     // PageContainer 添加页面小标题
     <PageContainer>
@@ -71,6 +83,7 @@ const BasicList = () => {
           columns={ColumnBuilder(init?.data?.layout.tableColumn)} // 表格列配置
           pagination={false} // 关闭默认分页
           loading={init?.loading} // 显示加载中效果
+          onChange={onChange}
         />
         {afterTableLayout()}
       </Card>
