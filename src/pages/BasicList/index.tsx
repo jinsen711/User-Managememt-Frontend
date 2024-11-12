@@ -3,14 +3,26 @@ import { Button, Card, Col, Pagination, Row, Space, Table } from 'antd';
 // Card 把 Col Row 包裹起来，使底色变成白色
 // Col Row 分栏布局
 import { useRequest } from '@umijs/max';
+import { useEffect, useState } from 'react';
 import styles from './index.less';
 
 const BasicList = () => {
+  const [page, setPage] = useState(1);
+  const [per_page, setPerPage] = useState(10);
   // useRequest 请求数据, 必须使用 localhost:8000 才能访问到输入，因为后端返回的 Access-Control-Allow-Origin 是 http://localhost:8000
   const init = useRequest<{ data: BasicListApi.Data }>(
-    'https://public-api-v2.aspirantzhang.com/api/admins?X-API-KEY=antd',
+    `https://public-api-v2.aspirantzhang.com/api/admins?X-API-KEY=antd&page=${page}&per_page=${per_page}`,
   );
-  console.log(init);
+
+  // 当 page 或者 per_page 变化时，重新请求数据
+  useEffect(() => {
+    init.run();
+  }, [page, per_page]);
+
+  const paginationChangeHandler = (_page: number, _per_page: number) => {
+    setPage(_page);
+    setPerPage(_per_page);
+  };
 
   const beforeTableLayout = () => {
     return (
@@ -40,7 +52,9 @@ const BasicList = () => {
             current={init?.data?.meta?.page || 1}
             pageSize={init?.data?.meta?.per_page || 10}
             showSizeChanger
-            showTotal={(total) => `总计${total}项`}
+            showTotal={(total) => `${total}项`}
+            onChange={paginationChangeHandler}
+            onShowSizeChange={paginationChangeHandler}
           />
         </Col>
       </Row>
