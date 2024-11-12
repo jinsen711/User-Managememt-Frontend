@@ -35,6 +35,7 @@ const ColumnBuilder = (columns: BasicListApi.TableColumn[] | undefined) => {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
+      sorter: true,
     },
   ];
 

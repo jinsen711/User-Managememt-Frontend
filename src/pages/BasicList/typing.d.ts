@@ -60,7 +60,7 @@ declare module BasicListApi {
     type?: string;
     data?: Datum[];
     hideInColumn?: boolean;
-    sorter?: boolean;
+    sorter: boolean;
     mode?: string;
     actions?: Action[];
     [keyof: string]: any; // 可以添加任意属性
