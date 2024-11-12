@@ -79,6 +79,7 @@ const BasicList = () => {
       <Card>
         {beforeTableLayout()}
         <Table
+          rowKey="id" // 设置行的唯一标识
           dataSource={init?.data?.dataSource} // 表格数据
           columns={ColumnBuilder(init?.data?.layout.tableColumn)} // 表格列配置
           pagination={false} // 关闭默认分页
