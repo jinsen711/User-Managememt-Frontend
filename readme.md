@@ -12,6 +12,8 @@
 
 json to ts: `https://json2ts.dev/`
 
+API 文档: `https://public-api-v2.aspirantzhang.com/admin/api`
+
 ## 安装和运行
 
     git clone -b learn git@github.com:jinsen711/User-Management-Frontend.git
