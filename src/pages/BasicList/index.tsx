@@ -1,5 +1,5 @@
 import { PageContainer } from '@ant-design/pro-layout';
-import { Card, Col, Pagination, Row, Space, Table } from 'antd';
+import { Button, Card, Col, Pagination, Row, Space, Table } from 'antd';
 // Card 把 Col Row 包裹起来，使底色变成白色
 // Col Row 分栏布局
 import { useRequest } from '@umijs/max';
@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 
 import ActionBuilder from './Builder/ActionBuilder';
 import ColumnBuilder from './Builder/ColumnBuilder';
+import Modal from './components/Modal';
 import styles from './index.less';
 
 const BasicList = () => {
@@ -14,6 +15,11 @@ const BasicList = () => {
   const [per_page, setPerPage] = useState(10);
   const [sort, setSort] = useState('id');
   const [order, setOrder] = useState('desc'); // 排序方式，asc 升序，desc 降序
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalUri, setModalUri] = useState(
+    'https://public-api-v2.aspirantzhang.com/api/admins/add?X-API-KEY=antd',
+  );
+
   // useRequest 请求数据, 必须使用 localhost:8000 才能访问到输入，因为后端返回的 Access-Control-Allow-Origin 是 http://localhost:8000
   const init = useRequest<{ data: BasicListApi.Data }>(
     `https://public-api-v2.aspirantzhang.com/api/admins?X-API-KEY=antd&page=${page}&per_page=${per_page}&sort=${sort}&order=${order}`,
@@ -76,6 +82,24 @@ const BasicList = () => {
   return (
     // PageContainer 添加页面小标题
     <PageContainer>
+      <Button
+        type="primary"
+        onClick={() => {
+          setModalUri('https://public-api-v2.aspirantzhang.com/api/admins/add?X-API-KEY=antd');
+          setIsModalOpen(true);
+        }}
+      >
+        新增
+      </Button>
+      <Button
+        type="primary"
+        onClick={() => {
+          setModalUri('https://public-api-v2.aspirantzhang.com/api/admins/206?X-API-KEY=antd');
+          setIsModalOpen(true);
+        }}
+      >
+        编辑
+      </Button>
       <Card>
         {beforeTableLayout()}
         <Table
@@ -88,6 +112,11 @@ const BasicList = () => {
         />
         {afterTableLayout()}
       </Card>
+      {Modal({
+        isOpen: isModalOpen,
+        onCancleHandler: () => setIsModalOpen(false),
+        modalUri: modalUri,
+      })}
     </PageContainer>
   );
 };
