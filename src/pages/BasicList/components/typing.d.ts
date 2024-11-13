@@ -1,21 +1,4 @@
 declare namespace PageApi {
-  interface Page {
-    title: string;
-    type: string;
-  }
-
-  interface Child {
-    id: number;
-    parent_id: number;
-    name: string;
-    create_time: string;
-    delete_time?: any;
-    status: number;
-    value: number;
-    title: string;
-    depth: number;
-  }
-
   interface Child2 {
     id: number;
     parent_id: number;
@@ -47,6 +30,7 @@ declare namespace PageApi {
     dataIndex: string;
     key: string;
     type: string;
+    disabled?: boolean;
     data?: Datum[];
   }
 
@@ -56,7 +40,7 @@ declare namespace PageApi {
     data: Datum2[];
   }
 
-  interface Action {
+  interface Datum3 {
     component: string;
     text: string;
     type: string;
@@ -65,20 +49,31 @@ declare namespace PageApi {
     method?: string;
   }
 
-  interface Actions {
+  interface Action {
     name: string;
     title: string;
-    data: Action[];
+    data: Datum3[];
   }
 
   interface Layout {
     tabs: Tab[];
-    actions: Actions[];
+    actions: Action[];
+  }
+
+  interface DataSource {
+    id: number;
+    username: string;
+    display_name: string;
+    create_time: string;
+    update_time: string;
+    status: number;
+    groups: number[];
   }
 
   interface Data {
     page: Page;
     layout: Layout;
+    dataSource: DataSource;
   }
 
   interface RootObject {
