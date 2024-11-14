@@ -71,6 +71,7 @@ const BasicList = () => {
 
   const onChange = (pagination: any, filters: any, sorter: any, extra: any) => {
     if (sorter.columnKey) {
+      console.log(extra);
       // 重置分页
       setPage(1);
       // 设置排序
@@ -94,7 +95,7 @@ const BasicList = () => {
       <Button
         type="primary"
         onClick={() => {
-          setModalUri('https://public-api-v2.aspirantzhang.com/api/admins/206?X-API-KEY=antd');
+          setModalUri('https://public-api-v2.aspirantzhang.com/api/admins/236?X-API-KEY=antd');
           setIsModalOpen(true);
         }}
       >

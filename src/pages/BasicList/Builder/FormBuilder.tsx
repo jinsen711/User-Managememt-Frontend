@@ -18,7 +18,12 @@ const FormBuilder = (data: PageApi.Datum2[] | undefined) => {
             );
           case 'switch':
             return (
-              <Form.Item label={field.title} key={field.key} name={field.dataIndex}>
+              <Form.Item
+                label={field.title}
+                key={field.key}
+                name={field.dataIndex}
+                valuePropName="checked"
+              >
                 <Switch disabled={field?.disabled}></Switch>
               </Form.Item>
             );
