@@ -1,11 +1,10 @@
 import { PageContainer } from '@ant-design/pro-layout';
-import { Button, Card, Col, Pagination, Row, Space, Table } from 'antd';
+import { Button, Card, Col, Pagination, Row, Table } from 'antd';
 // Card 把 Col Row 包裹起来，使底色变成白色
 // Col Row 分栏布局
 import { useRequest } from '@umijs/max';
 import { useEffect, useState } from 'react';
 
-import ActionBuilder from './Builder/ActionBuilder';
 import ColumnBuilder from './Builder/ColumnBuilder';
 import Modal from './components/Modal';
 import styles from './index.less';
@@ -40,7 +39,7 @@ const BasicList = () => {
           ...
         </Col>
         <Col xs={24} sm={12} className={styles.tableToolbar}>
-          <Space>{ActionBuilder(init?.data?.layout?.tableToolBar)}</Space>
+          {/* <Space>{ActionBuilder(init?.data?.layout?.tableToolBar)}</Space> */}
         </Col>
       </Row>
     );
