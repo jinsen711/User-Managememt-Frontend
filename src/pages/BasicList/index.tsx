@@ -16,9 +16,7 @@ const BasicList = () => {
   const [sort, setSort] = useState('id');
   const [order, setOrder] = useState('desc'); // 排序方式，asc 升序，desc 降序
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalUri, setModalUri] = useState(
-    'https://public-api-v2.aspirantzhang.com/api/admins/add?X-API-KEY=antd',
-  );
+  const [modalUri, setModalUri] = useState('');
 
   // useRequest 请求数据, 必须使用 localhost:8000 才能访问到输入，因为后端返回的 Access-Control-Allow-Origin 是 http://localhost:8000
   const init = useRequest<{ data: BasicListApi.Data }>(

@@ -28,8 +28,9 @@ const Modal = ({
   // 使用 useForm, 在外部控制复制 modal 中呈现的数据
   const [form] = Form.useForm();
 
-  // TODO: 每次加载时，modalUri 是空，导致请求失败，需要优化
-  const init = useRequest<{ data: PageApi.Data }>(`${modalUri}`);
+  const init = useRequest<{ data: PageApi.Data }>(`${modalUri}`, {
+    manual: true, // 手动模式，防止重复请求
+  });
 
   const setFieldsApadtor = (data: PageApi.Data | undefined) => {
     const fieldsValue = {};
