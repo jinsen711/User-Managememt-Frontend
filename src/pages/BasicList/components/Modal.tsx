@@ -35,6 +35,9 @@ const Modal = ({
 
   const request = useRequest(
     (data) => {
+      // 显示 loading
+      message.loading({ content: 'processing...', key: 'process', duration: 0 });
+      // 发送请求
       const { uri, method, ...formValues } = data;
       return {
         url: `https://public-api-v2.aspirantzhang.com${uri}`,
@@ -48,7 +51,7 @@ const Modal = ({
     {
       manual: true, // 手动模式，防止重复请求
       onSuccess: (res) => {
-        message.success(res.message);
+        message.success({ content: res.message, key: 'process' });
         // 关闭 modal
         modalOpenHandler();
       },

@@ -103,7 +103,7 @@ export const errorConfig: RequestConfig = {
       const { data } = response as unknown as ResponseStructure;
 
       if (data?.success === false) {
-        message.error(data.message);
+        message.error({ content: data.message, key: 'process', duration: 8 }); // 显示 8 秒的错误提示
       }
       return response;
     },
