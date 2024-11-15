@@ -2,8 +2,9 @@ import { Button } from 'antd';
 
 const ActionBuilder = (
   actions: BasicListApi.Action[] | undefined,
-  actionHandler: (action: BasicListApi.Action) => void,
-  loading: boolean,
+  actionHandler: (action: BasicListApi.Action, record: BasicListApi.DataSource) => void,
+  loading: boolean = false,
+  record: BasicListApi.DataSource = {},
 ) => {
   return (actions || []).map((action: BasicListApi.Action) => {
     return (
@@ -11,7 +12,7 @@ const ActionBuilder = (
         key={action?.text}
         type={action?.type as any}
         loading={loading}
-        onClick={() => actionHandler(action)}
+        onClick={() => actionHandler(action, record)}
       >
         {action?.text}
       </Button>

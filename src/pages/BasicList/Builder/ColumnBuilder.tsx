@@ -4,8 +4,7 @@ import ActionBuilder from './ActionBuilder';
 
 const ColumnBuilder = (
   columns: BasicListApi.Field[] | undefined,
-  actionHandler: (action: BasicListApi.Action) => void,
-  loading: boolean,
+  actionHandler: (action: BasicListApi.Action, record: BasicListApi.DataSource) => void,
 ) => {
   const result: any[] = [];
 
@@ -24,8 +23,8 @@ const ColumnBuilder = (
           };
           break;
         case 'actions':
-          column.render = () => {
-            return <Space>{ActionBuilder(column.actions, actionHandler, loading)}</Space>;
+          column.render = (_: any, record: BasicListApi.DataSource) => {
+            return <Space>{ActionBuilder(column.actions, actionHandler, false, record)}</Space>;
           };
           break;
         default:

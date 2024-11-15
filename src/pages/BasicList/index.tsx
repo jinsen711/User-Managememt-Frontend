@@ -32,8 +32,8 @@ const BasicList = () => {
     }
   }, [isModalOpen]);
 
-  const actionHandler = (action: BasicListApi.Action) => {
-    console.log(action);
+  const actionHandler = (action: BasicListApi.Action, record: BasicListApi.DataSource) => {
+    console.log(action, record);
     setModalUri(`https://public-api-v2.aspirantzhang.com${action.uri}?X-API-KEY=antd`);
     setIsModalOpen(true);
   };
@@ -50,9 +50,7 @@ const BasicList = () => {
           ...
         </Col>
         <Col xs={24} sm={12} className={styles.tableToolbar}>
-          <Space>
-            {ActionBuilder(init?.data?.layout?.tableToolBar, actionHandler, init.loading)}
-          </Space>
+          <Space>{ActionBuilder(init?.data?.layout?.tableToolBar, actionHandler)}</Space>
         </Col>
       </Row>
     );
@@ -93,30 +91,12 @@ const BasicList = () => {
   return (
     // PageContainer 添加页面小标题
     <PageContainer>
-      {/* <Button
-        type="primary"
-        onClick={() => {
-          setModalUri('https://public-api-v2.aspirantzhang.com/api/admins/add?X-API-KEY=antd');
-          setIsModalOpen(true);
-        }}
-      >
-        新增
-      </Button>
-      <Button
-        type="primary"
-        onClick={() => {
-          setModalUri('https://public-api-v2.aspirantzhang.com/api/admins/236?X-API-KEY=antd');
-          setIsModalOpen(true);
-        }}
-      >
-        编辑
-      </Button> */}
       <Card>
         {beforeTableLayout()}
         <Table
           rowKey="id" // 设置行的唯一标识
           dataSource={init?.data?.dataSource} // 表格数据
-          columns={ColumnBuilder(init?.data?.layout.tableColumn, actionHandler, init.loading)} // 表格列配置
+          columns={ColumnBuilder(init?.data?.layout.tableColumn, actionHandler)} // 表格列配置
           pagination={false} // 关闭默认分页
           loading={init?.loading} // 显示加载中效果
           onChange={onChange}
