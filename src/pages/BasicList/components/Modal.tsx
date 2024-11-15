@@ -4,14 +4,15 @@ import moment from 'moment';
 import { useEffect } from 'react';
 import ActionBuilder from '../Builder/ActionBuilder';
 import FormBuilder from '../Builder/FormBuilder';
+import { setFieldsApadtor, submitFieldsAdaptor } from '../helper';
 
 const Modal = ({
   isOpen,
-  onCancleHandler,
+  modalOpenHandler,
   modalUri,
 }: {
   isOpen: boolean;
-  onCancleHandler: () => void;
+  modalOpenHandler: () => void;
   modalUri: string;
 }) => {
   // 表单布局
@@ -28,7 +29,7 @@ const Modal = ({
   // 使用 useForm, 在外部控制复制 modal 中呈现的数据
   const [form] = Form.useForm();
 
-  const init = useRequest<{ data: PageApi.Data }>(`${modalUri}`, {
+  const init = useRequest<{ data: BasicListApi.PageData }>(`${modalUri}`, {
     manual: true, // 手动模式，防止重复请求
   });
 
@@ -38,33 +39,16 @@ const Modal = ({
       return {
         url: `https://public-api-v2.aspirantzhang.com${uri}`,
         method: method,
-        data: { ...formValues, 'X-API-KEY': 'antd' },
+        data: {
+          ...submitFieldsAdaptor(formValues),
+          'X-API-KEY': 'antd',
+        },
       };
     },
     {
       manual: true, // 手动模式，防止重复请求
     },
   );
-
-  const setFieldsApadtor = (data: PageApi.Data | undefined) => {
-    const fieldsValue = {};
-    if (data?.dataSource && data.layout) {
-      data.layout.tabs.forEach((tab) => {
-        tab.data.forEach((field) => {
-          switch (field.type) {
-            // TODO: 给对象赋值时的警告问题
-            case 'datetime':
-              fieldsValue[field.dataIndex] = moment(data.dataSource[field.dataIndex]);
-              break;
-            default:
-              fieldsValue[field.dataIndex] = data.dataSource[field.dataIndex];
-          }
-        });
-      });
-      return fieldsValue;
-    }
-    return {};
-  };
 
   // 当 modalUri 发生变化，且 isOpen 为 true 时，重新请求数据
   useEffect(() => {
@@ -86,14 +70,11 @@ const Modal = ({
   const onFinish = (values: any) => {
     const formValues = {
       ...values,
-      create_time: moment(values.create_time).format(),
-      update_time: moment(values.updated_time).format(),
     };
     request.run(formValues);
   };
 
   const actionHandler = (action: BasicListApi.Action) => {
-    console.log(action);
     switch (action.action) {
       case 'submit':
         form.setFieldsValue({ uri: action.uri, method: action.method });
@@ -109,7 +90,7 @@ const Modal = ({
       <AntdModal
         title={init?.data?.page?.title}
         open={isOpen}
-        onCancel={onCancleHandler}
+        onCancel={modalOpenHandler}
         maskClosable={false} // 点击蒙层不允许关闭
         footer={ActionBuilder(init?.data?.layout?.actions[0].data, actionHandler)}
       >

@@ -1,9 +1,9 @@
 import { DatePicker, Form, Input, Switch, TreeSelect } from 'antd';
 
-const FormBuilder = (data: PageApi.Datum2[] | undefined) => {
+const FormBuilder = (data: BasicListApi.Field[] | undefined) => {
   return (
     <div>
-      {(data || []).map((field: PageApi.Datum2) => {
+      {(data || []).map((field: BasicListApi.Field) => {
         // 对不同类型字段进行不同的处理
         switch (field.type) {
           case 'datetime':

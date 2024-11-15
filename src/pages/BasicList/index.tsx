@@ -1,10 +1,8 @@
 import { PageContainer } from '@ant-design/pro-layout';
-import { Button, Card, Col, Pagination, Row, Table } from 'antd';
-// Card 把 Col Row 包裹起来，使底色变成白色
-// Col Row 分栏布局
 import { useRequest } from '@umijs/max';
+import { Card, Col, Pagination, Row, Space, Table } from 'antd';
 import { useEffect, useState } from 'react';
-
+import ActionBuilder from './Builder/ActionBuilder';
 import ColumnBuilder from './Builder/ColumnBuilder';
 import Modal from './components/Modal';
 import styles from './index.less';
@@ -18,7 +16,7 @@ const BasicList = () => {
   const [modalUri, setModalUri] = useState('');
 
   // useRequest 请求数据, 必须使用 localhost:8000 才能访问到输入，因为后端返回的 Access-Control-Allow-Origin 是 http://localhost:8000
-  const init = useRequest<{ data: BasicListApi.Data }>(
+  const init = useRequest<{ data: BasicListApi.ListData }>(
     `https://public-api-v2.aspirantzhang.com/api/admins?X-API-KEY=antd&page=${page}&per_page=${per_page}&sort=${sort}&order=${order}`,
   );
 
@@ -26,6 +24,12 @@ const BasicList = () => {
   useEffect(() => {
     init.run();
   }, [page, per_page, sort, order]);
+
+  const actionHandler = (action: BasicListApi.Action) => {
+    console.log(action);
+    setModalUri(`https://public-api-v2.aspirantzhang.com${action.uri}?X-API-KEY=antd`);
+    setIsModalOpen(true);
+  };
 
   const paginationChangeHandler = (_page: number, _per_page: number) => {
     setPage(_page);
@@ -39,7 +43,7 @@ const BasicList = () => {
           ...
         </Col>
         <Col xs={24} sm={12} className={styles.tableToolbar}>
-          {/* <Space>{ActionBuilder(init?.data?.layout?.tableToolBar)}</Space> */}
+          <Space>{ActionBuilder(init?.data?.layout?.tableToolBar, actionHandler)}</Space>
         </Col>
       </Row>
     );
@@ -80,7 +84,7 @@ const BasicList = () => {
   return (
     // PageContainer 添加页面小标题
     <PageContainer>
-      <Button
+      {/* <Button
         type="primary"
         onClick={() => {
           setModalUri('https://public-api-v2.aspirantzhang.com/api/admins/add?X-API-KEY=antd');
@@ -97,13 +101,13 @@ const BasicList = () => {
         }}
       >
         编辑
-      </Button>
+      </Button> */}
       <Card>
         {beforeTableLayout()}
         <Table
           rowKey="id" // 设置行的唯一标识
           dataSource={init?.data?.dataSource} // 表格数据
-          columns={ColumnBuilder(init?.data?.layout.tableColumn)} // 表格列配置
+          columns={ColumnBuilder(init?.data?.layout.tableColumn, actionHandler)} // 表格列配置
           pagination={false} // 关闭默认分页
           loading={init?.loading} // 显示加载中效果
           onChange={onChange}
@@ -112,7 +116,7 @@ const BasicList = () => {
       </Card>
       {Modal({
         isOpen: isModalOpen,
-        onCancleHandler: () => setIsModalOpen(false),
+        modalOpenHandler: () => setIsModalOpen(false),
         modalUri: modalUri,
       })}
     </PageContainer>
