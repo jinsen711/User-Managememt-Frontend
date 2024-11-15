@@ -1,5 +1,5 @@
 import { useRequest } from '@umijs/max';
-import { Modal as AntdModal, Form, Input } from 'antd';
+import { Modal as AntdModal, Form, Input, message } from 'antd';
 import moment from 'moment';
 import { useEffect } from 'react';
 import ActionBuilder from '../Builder/ActionBuilder';
@@ -47,6 +47,15 @@ const Modal = ({
     },
     {
       manual: true, // 手动模式，防止重复请求
+      onSuccess: (res) => {
+        message.success(res.message);
+        // 关闭 modal
+        modalOpenHandler();
+      },
+
+      formatResult(res) {
+        return res;
+      },
     },
   );
 
@@ -66,21 +75,21 @@ const Modal = ({
     }
   }, [init?.data]);
 
-  // TODO: 不知道这里的 values 是什么类型
-  const onFinish = (values: any) => {
-    const formValues = {
-      ...values,
-    };
+  const onFinish = (formValues: BasicListApi.DataSource) => {
+    // 发送请求
     request.run(formValues);
   };
 
   const actionHandler = (action: BasicListApi.Action) => {
     switch (action.action) {
       case 'submit':
+        // 添加额外的 uri 和 method 字段
         form.setFieldsValue({ uri: action.uri, method: action.method });
+        // 提交表单
         form.submit();
         break;
-      case 'update':
+      default:
+        console.log('暂不支持的操作', action);
         break;
     }
   };
@@ -92,7 +101,7 @@ const Modal = ({
         open={isOpen}
         onCancel={modalOpenHandler}
         maskClosable={false} // 点击蒙层不允许关闭
-        footer={ActionBuilder(init?.data?.layout?.actions[0].data, actionHandler)}
+        footer={ActionBuilder(init?.data?.layout?.actions[0].data, actionHandler, request.loading)}
       >
         <Form
           {...formItemLayout}

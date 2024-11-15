@@ -25,6 +25,13 @@ const BasicList = () => {
     init.run();
   }, [page, per_page, sort, order]);
 
+  // modal 关闭后自动刷新页面
+  useEffect(() => {
+    if (!isModalOpen) {
+      init.run();
+    }
+  }, [isModalOpen]);
+
   const actionHandler = (action: BasicListApi.Action) => {
     console.log(action);
     setModalUri(`https://public-api-v2.aspirantzhang.com${action.uri}?X-API-KEY=antd`);
@@ -43,7 +50,9 @@ const BasicList = () => {
           ...
         </Col>
         <Col xs={24} sm={12} className={styles.tableToolbar}>
-          <Space>{ActionBuilder(init?.data?.layout?.tableToolBar, actionHandler)}</Space>
+          <Space>
+            {ActionBuilder(init?.data?.layout?.tableToolBar, actionHandler, init.loading)}
+          </Space>
         </Col>
       </Row>
     );
@@ -107,7 +116,7 @@ const BasicList = () => {
         <Table
           rowKey="id" // 设置行的唯一标识
           dataSource={init?.data?.dataSource} // 表格数据
-          columns={ColumnBuilder(init?.data?.layout.tableColumn, actionHandler)} // 表格列配置
+          columns={ColumnBuilder(init?.data?.layout.tableColumn, actionHandler, init.loading)} // 表格列配置
           pagination={false} // 关闭默认分页
           loading={init?.loading} // 显示加载中效果
           onChange={onChange}
