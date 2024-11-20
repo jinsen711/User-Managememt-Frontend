@@ -2,7 +2,7 @@ import moment from 'moment';
 
 export const setFieldsApadtor = (data: BasicListApi.PageData | undefined) => {
   const fieldsValue: BasicListApi.DataSource = {};
-  if (data?.dataSource && data.layout) {
+  if (data?.dataSource && data?.layout) {
     data.layout.tabs.forEach((tab) => {
       tab.data.forEach((field) => {
         switch (field.type) {

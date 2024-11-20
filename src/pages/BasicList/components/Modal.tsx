@@ -8,11 +8,11 @@ import { setFieldsApadtor, submitFieldsAdaptor } from '../helper';
 
 const Modal = ({
   isOpen,
-  modalOpenHandler,
+  closeModal,
   modalUri,
 }: {
   isOpen: boolean;
-  modalOpenHandler: () => void;
+  closeModal: (reload?: boolean) => void;
   modalUri: string;
 }) => {
   // 表单布局
@@ -29,9 +29,12 @@ const Modal = ({
   // 使用 useForm, 在外部控制复制 modal 中呈现的数据
   const [form] = Form.useForm();
 
-  const init = useRequest<{ data: BasicListApi.PageData }>(`${modalUri}`, {
-    manual: true, // 手动模式，防止重复请求
-  });
+  const init = useRequest<{ data: BasicListApi.PageData }>(
+    `https://public-api-v2.aspirantzhang.com${modalUri}?X-API-KEY=antd`,
+    {
+      manual: true, // 手动模式，防止重复请求
+    },
+  );
 
   const request = useRequest(
     (data) => {
@@ -53,7 +56,7 @@ const Modal = ({
       onSuccess: (res) => {
         message.success({ content: res.message, key: 'process' });
         // 关闭 modal
-        modalOpenHandler();
+        closeModal(true);
       },
 
       formatResult(res) {
@@ -91,6 +94,15 @@ const Modal = ({
         // 提交表单
         form.submit();
         break;
+      case 'cancel':
+        // 关闭弹窗
+        closeModal();
+        break;
+      case 'reset':
+        // 初始化弹窗内容.清空，如何原来有内容，添加上去
+        form.resetFields();
+        form.setFieldsValue(setFieldsApadtor(init?.data));
+        break;
       default:
         console.log('暂不支持的操作', action);
         break;
@@ -102,7 +114,10 @@ const Modal = ({
       <AntdModal
         title={init?.data?.page?.title}
         open={isOpen}
-        onCancel={modalOpenHandler}
+        // closeModal 和 onCalcel 的类型不一样，解释思路，传递一个没有参数的函数，在这个函数中执行 closeModal
+        onCancel={() => {
+          closeModal();
+        }}
         maskClosable={false} // 点击蒙层不允许关闭
         footer={ActionBuilder(init?.data?.layout?.actions[0].data, actionHandler, request.loading)}
       >
