@@ -2,7 +2,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { FooterToolbar, PageContainer } from '@ant-design/pro-layout';
 import { useRequest } from '@umijs/max';
 import { Modal as AntdModal, Card, Col, Pagination, Row, Space, Table, message } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ActionBuilder from './Builder/ActionBuilder';
 import ColumnBuilder from './Builder/ColumnBuilder';
 import Modal from './components/Modal';
@@ -11,23 +11,19 @@ import styles from './index.less';
 export type Key = React.Key;
 
 const BasicList = () => {
-  const [page, setPage] = useState(1);
-  const [per_page, setPerPage] = useState(10);
-  const [sort, setSort] = useState('id');
-  const [order, setOrder] = useState('desc'); // 排序方式，asc 升序，desc 降序
+  const [pageQuery, setPageQuery] = useState('');
+  const [sorterQuery, setSorterQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalUri, setModalUri] = useState('');
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const [selectedRows, setSelectRows] = useState<BasicListApi.DataSource[]>([]);
   const [tableColumns, setTableColumns] = useState<BasicListApi.Field[]>([]);
-
+  const tableColumnsRef = useRef(tableColumns);
   const { confirm } = AntdModal;
-
   // useRequest 请求数据, 必须使用 localhost:8000 才能访问到输入，因为后端返回的 Access-Control-Allow-Origin 是 http://localhost:8000
   const init = useRequest<{ data: BasicListApi.ListData }>(
-    `https://public-api-v2.aspirantzhang.com/api/admins?X-API-KEY=antd&page=${page}&per_page=${per_page}&sort=${sort}&order=${order}`,
+    `https://public-api-v2.aspirantzhang.com/api/admins?X-API-KEY=antd${pageQuery}${sorterQuery}`,
   );
-
   const request = useRequest(
     (data) => {
       // 显示 loading
@@ -55,14 +51,14 @@ const BasicList = () => {
     },
   );
 
-  // 删除弹窗时显示的列表
-  const batchVoerview = () => {
+  // 删除弹窗上渲染的列表
+  const batchVoerview = (dataSource: BasicListApi.DataSource[]) => {
     return (
       <Table
         size="small"
         rowKey={'id'}
-        dataSource={selectedRows} // 表格数据
-        columns={[tableColumns[0], tableColumns[1]]} // 表格列配置
+        dataSource={dataSource} // 表格数据
+        columns={[tableColumnsRef.current[0], tableColumnsRef.current[1]]}
         pagination={false} // 关闭默认分页
       />
     );
@@ -70,64 +66,95 @@ const BasicList = () => {
 
   // 按钮功能
   const actionHandler = (action: BasicListApi.Action, record: BasicListApi.DataSource) => {
-    switch (action.action) {
+    switch (action?.action) {
       case 'modal':
         setModalUri(
-          action.uri.replace(/:\w+/g, (field) => {
+          (action?.uri || '').replace(/:\w+/g, (field) => {
             return record[field.replace(':', '')];
           }),
         );
-        setIsModalOpen(true);
         break;
       case 'reload':
         init.run();
         break;
+      // TODO: 未做文本区分, 都是使用 delete 的文本
       case 'delete':
+      case 'restore':
+      case 'deletePermanently':
         confirm({
           icon: <ExclamationCircleOutlined />,
           title: '是否删除一下内容',
-          content: batchVoerview(),
-          okText: '删除',
-          okType: 'danger',
+          content: batchVoerview(Object.keys(record).length ? [record] : selectedRows),
+          okText: action.text,
+          okType: action.type as any,
           onOk() {
             return request.run({
               uri: action.uri,
               method: action.method,
-              type: 'delete',
-              ids: selectedRowKeys,
+              type: action.action,
+              ids: Object.keys(record).length ? [record.id] : selectedRowKeys,
             });
           },
         });
+        break;
+      case 'batchDisable':
+        setSelectedRowKeys([]);
         break;
       default:
         console.log(`当前未做处理 ${action.action}`);
     }
   };
 
-  // 分页-表格排序, 当 page 或者 per_page 变化时，重新请求数据
+  // 分页-表格排序
   useEffect(() => {
     init.run();
-  }, [page, per_page, sort, order]);
-  const paginationChangeHandler = (_page: number, _per_page: number) => {
-    setPage(_page);
-    setPerPage(_per_page);
-  };
-  const onChange = (_: any, __: any, sorter: any) => {
-    if (sorter.columnKey) {
-      // 重置分页
-      setPage(1);
-      // 设置排序
-      setSort(sorter.columnKey);
-      setOrder(sorter.order === 'ascend' ? 'asc' : 'desc');
-    }
-  };
+  }, [pageQuery, sorterQuery]);
 
-  // 自动构建 Table Column
+  // 自动构建 TableColumns
   useEffect(() => {
     if (init.data?.layout.tableColumn) {
       setTableColumns(ColumnBuilder(init?.data?.layout?.tableColumn, actionHandler));
     }
   }, [init.data?.layout.tableColumn]);
+
+  // 保存 tableColumns, 防止出现闭包问题
+  useEffect(() => {
+    if (tableColumns) {
+      tableColumnsRef.current = tableColumns;
+    }
+  }, [tableColumns]);
+
+  // 当 modalUri 改变且不为空时打开弹窗
+  useEffect(() => {
+    if (modalUri) {
+      setIsModalOpen(true);
+    }
+  }, [modalUri]);
+
+  // 分页
+  const paginationChangeHandler = (page: number, per_page: number) => {
+    setPageQuery(`&page=${page}&per_page=${per_page}`);
+  };
+
+  // 排序
+  const sorterChangeHandler = (_: any, __: any, sorter: any) => {
+    if (sorter.order === undefined) {
+      setSorterQuery('');
+    } else {
+      const orderBy = sorter.order === 'ascend' ? 'asc' : 'desc';
+      setSorterQuery(`&sorter=${sorter.field}&order=${orderBy}`);
+    }
+  };
+
+  // 关闭弹窗
+  const closeModal = (reload: boolean = false) => {
+    setIsModalOpen(false); // 关闭弹窗
+    setModalUri(''); // 重置 modalUri
+    // 根据 reload 参数判断是否刷新页面
+    if (reload) {
+      init.run();
+    }
+  };
 
   // 多选功能
   const rowSelection = {
@@ -172,7 +199,7 @@ const BasicList = () => {
     );
   };
 
-  // 多选删除功能
+  // 多选删除按钮渲染
   const batchToolBar = () => {
     return (
       selectedRowKeys.length > 0 && (
@@ -192,7 +219,7 @@ const BasicList = () => {
           columns={tableColumns} // 表格列配置
           pagination={false} // 关闭默认分页
           loading={init?.loading} // 显示加载中效果
-          onChange={onChange}
+          onChange={sorterChangeHandler}
           rowSelection={rowSelection}
         />
         {afterTableLayout()}
@@ -204,13 +231,7 @@ const BasicList = () => {
       {/* 弹窗，默认是关闭状态，通过按钮等方式触发显示 */}
       {Modal({
         isOpen: isModalOpen,
-        closeModal: (reload: boolean = false) => {
-          setIsModalOpen(false);
-          // 根据 reload 参数判断是否刷新页面
-          if (reload) {
-            init.run();
-          }
-        },
+        closeModal: closeModal,
         modalUri: modalUri,
       })}
     </PageContainer>

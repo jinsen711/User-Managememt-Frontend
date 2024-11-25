@@ -26,6 +26,7 @@ const Modal = ({
       sm: { span: 14 },
     },
   };
+
   // 使用 useForm, 在外部控制复制 modal 中呈现的数据
   const [form] = Form.useForm();
 
@@ -35,7 +36,6 @@ const Modal = ({
       manual: true, // 手动模式，防止重复请求
     },
   );
-
   const request = useRequest(
     (data) => {
       // 显示 loading
@@ -58,7 +58,6 @@ const Modal = ({
         // 关闭 modal
         closeModal(true);
       },
-
       formatResult(res) {
         return res;
       },
@@ -75,14 +74,15 @@ const Modal = ({
     }
   }, [isOpen]);
 
+  // 弹窗打开时设置弹窗中的值
   useEffect(() => {
     if (init?.data?.dataSource) {
       form.setFieldsValue(setFieldsApadtor(init?.data));
     }
   }, [init?.data]);
 
+  // 发送请求
   const onFinish = (formValues: BasicListApi.DataSource) => {
-    // 发送请求
     request.run(formValues);
   };
 
@@ -110,33 +110,33 @@ const Modal = ({
   };
 
   return (
-    <div>
-      <AntdModal
-        title={init?.data?.page?.title}
-        open={isOpen}
-        // closeModal 和 onCalcel 的类型不一样，解释思路，传递一个没有参数的函数，在这个函数中执行 closeModal
-        onCancel={() => {
-          closeModal();
-        }}
-        maskClosable={false} // 点击蒙层不允许关闭
-        footer={ActionBuilder(init?.data?.layout?.actions[0].data, actionHandler, request.loading)}
+    <AntdModal
+      title={init?.data?.page?.title}
+      open={isOpen}
+      // closeModal 和 onCalcel 的类型不一样，解释思路，传递一个没有参数的函数，在这个函数中执行 closeModal
+      onCancel={() => {
+        closeModal();
+      }}
+      maskClosable={false} // 点击蒙层不允许关闭
+      loading={init?.loading}
+      footer={ActionBuilder(init?.data?.layout?.actions[0].data, actionHandler, request?.loading)}
+      forceRender // 解决一些报错
+    >
+      <Form
+        {...formItemLayout}
+        form={form}
+        onFinish={onFinish}
+        initialValues={{ create_time: moment(), update_time: moment(), status: false }}
       >
-        <Form
-          {...formItemLayout}
-          form={form}
-          onFinish={onFinish}
-          initialValues={{ create_time: moment(), update_time: moment(), status: false }}
-        >
-          {FormBuilder(init?.data?.layout?.tabs[0]?.data)}
-          <Form.Item key="uri" name="uri" hidden>
-            <Input />
-          </Form.Item>
-          <Form.Item key="method" name="method" hidden>
-            <Input />
-          </Form.Item>
-        </Form>
-      </AntdModal>
-    </div>
+        {FormBuilder(init?.data?.layout?.tabs[0]?.data)}
+        <Form.Item key="uri" name="uri" hidden>
+          <Input />
+        </Form.Item>
+        <Form.Item key="method" name="method" hidden>
+          <Input />
+        </Form.Item>
+      </Form>
+    </AntdModal>
   );
 };
 
