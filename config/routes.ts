@@ -58,6 +58,12 @@ export default [
     component: './BasicList',
   },
   {
+    name: 'form.basic-form',
+    icon: 'form',
+    path: '/basic-list/api/admins/*',
+    component: './BasicList/components/Page',
+  },
+  {
     path: '/',
     redirect: '/welcome',
   },

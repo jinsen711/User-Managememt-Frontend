@@ -1,6 +1,6 @@
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { FooterToolbar, PageContainer } from '@ant-design/pro-layout';
-import { useRequest } from '@umijs/max';
+import { history, useRequest } from '@umijs/max';
 import { Modal as AntdModal, Card, Col, Pagination, Row, Space, Table, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import ActionBuilder from './Builder/ActionBuilder';
@@ -96,6 +96,12 @@ const BasicList = () => {
             });
           },
         });
+        break;
+      case 'page':
+        const uri = (action?.uri || '').replace(/:\w+/g, (field) => {
+          return record[field.replace(':', '')];
+        });
+        history.push(`/basic-list${uri}`);
         break;
       case 'batchDisable':
         setSelectedRowKeys([]);
