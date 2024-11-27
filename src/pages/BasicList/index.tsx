@@ -209,7 +209,9 @@ const BasicList = () => {
   const batchToolBar = () => {
     return (
       selectedRowKeys.length > 0 && (
-        <Space>{ActionBuilder(init?.data?.layout?.batchToolBar, actionHandler)}</Space>
+        <Space>
+          {ActionBuilder(init?.data?.layout?.batchToolBar, actionHandler, request.loading)}
+        </Space>
       )
     );
   };

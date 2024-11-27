@@ -136,7 +136,7 @@ const Page = () => {
             <Card>
               <Space>
                 {(init?.data?.layout?.actions || []).map((action) => {
-                  return ActionBuilder(action.data, actionHandler);
+                  return ActionBuilder(action.data, actionHandler, request.loading);
                 })}
               </Space>
             </Card>
@@ -146,7 +146,7 @@ const Page = () => {
         <FooterToolbar>
           <Space>
             {(init?.data?.layout?.actions || []).map((action) => {
-              return ActionBuilder(action.data, actionHandler);
+              return ActionBuilder(action.data, actionHandler, request.loading);
             })}
           </Space>
         </FooterToolbar>
