@@ -51,6 +51,7 @@ export default [
     path: '/list',
     component: './TableList',
   },
+
   {
     name: 'list.basic-list',
     icon: 'table',
@@ -62,6 +63,12 @@ export default [
     icon: 'form',
     path: '/basic-list/api/admins/*',
     component: './BasicList/components/Page',
+  },
+  {
+    name: 'list.basic-list',
+    icon: 'test',
+    path: '/basic-list/test',
+    component: './BasicList/components/test',
   },
   {
     path: '/',

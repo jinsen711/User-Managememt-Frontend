@@ -1,7 +1,18 @@
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { ExclamationCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import { FooterToolbar, PageContainer } from '@ant-design/pro-layout';
 import { history, useRequest } from '@umijs/max';
-import { Modal as AntdModal, Card, Col, Pagination, Row, Space, Table, message } from 'antd';
+import {
+  Modal as AntdModal,
+  Button,
+  Card,
+  Col,
+  message,
+  Pagination,
+  Row,
+  Space,
+  Table,
+  Tooltip,
+} from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import ActionBuilder from './Builder/ActionBuilder';
 import ColumnBuilder from './Builder/ColumnBuilder';
@@ -14,6 +25,7 @@ const BasicList = () => {
   const [pageQuery, setPageQuery] = useState('');
   const [sorterQuery, setSorterQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [modalUri, setModalUri] = useState('');
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const [selectedRows, setSelectRows] = useState<BasicListApi.DataSource[]>([]);
@@ -171,6 +183,10 @@ const BasicList = () => {
     },
   };
 
+  const searchToolBar = () => {
+    return <Card hidden={!isSearchOpen}>search</Card>;
+  };
+
   const beforeTableLayout = () => {
     return (
       <Row>
@@ -178,7 +194,19 @@ const BasicList = () => {
           ...
         </Col>
         <Col xs={24} sm={12} className={styles.tableToolbar}>
-          <Space>{ActionBuilder(init?.data?.layout?.tableToolBar, actionHandler)}</Space>
+          <Space>
+            <Tooltip title="search">
+              <Button
+                type={isSearchOpen ? 'primary' : 'default'}
+                shape="circle"
+                icon={<SearchOutlined />}
+                onClick={() => {
+                  setIsSearchOpen(!isModalOpen);
+                }}
+              />
+            </Tooltip>
+            {ActionBuilder(init?.data?.layout?.tableToolBar, actionHandler)}
+          </Space>
         </Col>
       </Row>
     );
@@ -219,6 +247,7 @@ const BasicList = () => {
   return (
     // PageContainer 添加页面小标题
     <PageContainer>
+      {searchToolBar()}
       <Card>
         {beforeTableLayout()}
         <Table
